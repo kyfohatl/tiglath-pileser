@@ -39,7 +39,7 @@ void get_enemy_positions(types::side side) {
 
   int i = 0;
   for (auto cluster : enemy_clusters) {
-    auto marker = sqf::create_marker(std::to_string(i++), cluster.centroid);
+    auto marker = sqf::create_marker(std::to_string(i++), cluster.get()->centroid);
     sqf::set_marker_type(marker, "hd_dot");
   }
 }

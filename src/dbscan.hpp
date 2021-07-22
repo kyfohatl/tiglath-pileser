@@ -29,5 +29,5 @@ namespace dbscan {
 
   std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon = 100.f, uint32_t min_points = 10);
 
-  std::shared_ptr<types::cluster> get_cluster(types::node node, std::shared_ptr<types::cluster> parent_cluster = nullptr);
+  std::shared_ptr<types::cluster> form_core_cluster(types::node node, std::shared_ptr<types::cluster> parent_cluster = nullptr);
 };
