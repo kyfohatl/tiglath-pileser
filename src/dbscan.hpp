@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <functional>
 
 #include <intercept.hpp>
 
@@ -14,16 +15,16 @@ namespace dbscan {
       UNKNOWN
     };
 
-    struct node {
-      intercept::types::object object;
-      std::vector<node&> neighbors;
-      node_type type = node_type::UNKNOWN;
-      std::shared_ptr<cluster> allocated_cluster = nullptr;
-    };
-
     struct cluster {
       std::vector<intercept::types::object> objects;
       intercept::types::vector2 centroid;
+    };
+
+    struct node {
+      intercept::types::object object;
+      std::vector<std::reference_wrapper<node>> neighbors;
+      node_type type = node_type::UNKNOWN;
+      std::shared_ptr<cluster> allocated_cluster = nullptr;
     };
   };
 

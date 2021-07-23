@@ -19,15 +19,6 @@ void intercept::pre_init() {
   sqf::system_chat("The Intercept template plugin is running!");
 }
 
-// void display_units_on_map() {
-//   std::vector<types::object> all_units = sqf::all_units();
-//   for (auto unit : all_units) {
-//     auto pos_matrix = ((game_data_object*) unit.data.getRef())->get_position_matrix();
-//     auto marker = sqf::create_marker(sqf::str(unit), pos_matrix._position);
-//     sqf::set_marker_type(marker, "hd_dot");
-//   }
-// }
-
 std::vector<types::object> get_known_units(types::side side) {
   return sqf::units(side);
 }
@@ -36,6 +27,19 @@ void get_enemy_positions(types::side side) {
   auto units = get_known_units(side);
 
   auto enemy_clusters = dbscan::dbscan(units);
+
+  auto marker_colors = std::vector<std::string>({"ColorBlack", "ColorRed", "ColorBrown", "ColorBlue", "ColorGreen", "ColorWhite", "ColorOrange"});
+
+  for (int i = 0; i < enemy_clusters.size(); i++) {
+    auto marker_color = marker_colors[i];
+    auto cur_cluster = enemy_clusters[i];
+
+    for (auto unit : cur_cluster.get()->objects) {
+      auto marker = sqf::create_marker(sqf::str(unit), sqf::get_pos(unit));
+      sqf::set_marker_type(marker, "hd_dot");
+      sqf::set_marker_color(marker, marker_color);
+    }
+  }
 
   int i = 0;
   for (auto cluster : enemy_clusters) {
@@ -46,6 +50,5 @@ void get_enemy_positions(types::side side) {
 
 // This function is exported and is called by the host at the end of mission initialization.
 void intercept::post_init() {
-  // display_units_on_map();
   get_known_units(sqf::get_side(sqf::player()));
 }
