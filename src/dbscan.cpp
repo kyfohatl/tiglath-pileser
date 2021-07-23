@@ -48,38 +48,71 @@ namespace dbscan {
 
     auto clusters = std::vector<std::shared_ptr<types::cluster>>();
 
-    for (auto node : all_nodes) {
-      if (node.type == types::node_type::CORE || node.type == types::node_type::BORDER) {
-        if (node.allocated_cluster != nullptr) {
-          continue;
-        }
-
-        auto cluster = form_core_cluster(node, nullptr);
-
-        cluster.get()->centroid /= cluster.get()->objects.size();
-
-        clusters.push_back(cluster);
+    // Core points within epsilon distance of each other must be grouped into the same cluster
+    for (auto node : core_nodes) {
+      if (node.allocated_cluster != nullptr) {
+        continue;
       }
+
+      auto cluster = form_core_cluster(node, nullptr);
+      clusters.push_back(cluster);
+    }
+
+    // Border points must then be allocated to a neighboring cluster
+    // Currently border points are just allocated to the first neighboring cluster
+    for (auto node : all_nodes) {
+      if (node.type = types::node_type::BORDER) {
+        for (auto neighbor : node.neighbors) {
+          if (neighbor.type = types::node_type::CORE) {
+            node.allocated_cluster = neighbor.allocated_cluster;
+            node.allocated_cluster.get()->objects.push_back(node.object);
+
+            auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
+            node.allocated_cluster.get()->centroid += intercept::types::vector2(object_position);
+
+            break;
+          }
+        }
+      }
+    }
+
+    // Finally, we must calculate the centroid for each cluster
+    for (auto cluster : clusters) {
+      cluster.get()->centroid /= cluster.get()->objects.size();
     }
 
     return clusters;
   }
 
+
+  // Forms a cluster using the given core point and all connected neighboring and neighbors of neighboring core points
+  // and returns the result
   std::shared_ptr<types::cluster> form_core_cluster(types::node node, std::shared_ptr<types::cluster> parent_cluster) {
+    // Check if node has already been visited
     if (node.allocated_cluster != nullptr) {
       return node.allocated_cluster;
     }
 
+    // If no cluster has been given, create one
     auto cluster = parent_cluster;
+    auto object_position = intercept::types::vector2(((game_data_object*) node.object.data.getRef())->get_position_matrix()._position);
     if (cluster == nullptr) {
       cluster = std::make_shared<types::cluster>();
+      cluster.get()->centroid = object_position;
+    } else {
+      cluster.get()->centroid += object_position;
     }
 
     node.allocated_cluster = cluster;
-
     cluster.get()->objects.push_back(node.object);
 
-    auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
-    cluster.get()->centroid += intercept::types::vector2(object_position);
+    // All neighboring core points must also be allocated to the same cluster
+    for (auto neighbor : node.neighbors) {
+      if (neighbor.type == types::node_type::CORE) {
+        form_core_cluster(neighbor, cluster);
+      }
+    }
+
+    return cluster;
   }
 };
