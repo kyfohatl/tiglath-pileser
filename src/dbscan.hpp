@@ -8,7 +8,7 @@
 
 namespace dbscan {
   namespace types {
-    enum node_type {
+    enum class node_type : uint8_t {
       CORE,
       BORDER,
       NOISE,
@@ -28,7 +28,7 @@ namespace dbscan {
     };
   };
 
-  std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon = 100.f, uint32_t min_points = 10);
+  std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon = 2500.f, uint32_t min_points = 4);
 
   std::shared_ptr<types::cluster> form_core_cluster(types::node node, std::shared_ptr<types::cluster> parent_cluster = nullptr);
 };

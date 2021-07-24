@@ -26,29 +26,37 @@ std::vector<types::object> get_known_units(types::side side) {
 void get_enemy_positions(types::side side) {
   auto units = get_known_units(side);
 
-  auto enemy_clusters = dbscan::dbscan(units);
+  // auto enemy_clusters = dbscan::dbscan(units);
 
-  auto marker_colors = std::vector<std::string>({"ColorBlack", "ColorRed", "ColorBrown", "ColorBlue", "ColorGreen", "ColorWhite", "ColorOrange"});
+  // auto marker_colors = std::vector<std::string>({"ColorBlack", "ColorRed", "ColorBrown", "ColorBlue", "ColorGreen", "ColorWhite", "ColorOrange"});
 
-  for (int i = 0; i < enemy_clusters.size(); i++) {
-    auto marker_color = marker_colors[i];
-    auto cur_cluster = enemy_clusters[i];
+  // for (int i = 0; i < enemy_clusters.size(); i++) {
+  //   auto marker_color = marker_colors[i];
+  //   auto cur_cluster = enemy_clusters[i];
 
-    for (auto unit : cur_cluster.get()->objects) {
-      auto marker = sqf::create_marker(sqf::str(unit), sqf::get_pos(unit));
-      sqf::set_marker_type(marker, "hd_dot");
-      sqf::set_marker_color(marker, marker_color);
-    }
-  }
+  //   for (auto unit : cur_cluster.get()->objects) {
+  //     auto marker = sqf::create_marker(sqf::str(unit), sqf::get_pos(unit));
+  //     sqf::set_marker_type(marker, "hd_dot");
+  //     sqf::set_marker_color(marker, marker_color);
+  //   }
+  // }
 
-  int i = 0;
-  for (auto cluster : enemy_clusters) {
-    auto marker = sqf::create_marker(std::to_string(i++), cluster.get()->centroid);
-    sqf::set_marker_type(marker, "hd_dot");
-  }
+  // int i = 0;
+  // for (auto cluster : enemy_clusters) {
+  //   auto marker = sqf::create_marker(std::to_string(i++), cluster.get()->centroid);
+  //   sqf::set_marker_type(marker, "hd_dot");
+  // }
+}
+
+// This function is exported and is called by the host each frame.
+void __cdecl intercept::on_frame() {
+  // send it to the binary SQF sideChat command
+  intercept::sqf::side_chat(sqf::player(), "Hello HAHA");
+  get_enemy_positions(sqf::get_side(sqf::player()));
 }
 
 // This function is exported and is called by the host at the end of mission initialization.
 void intercept::post_init() {
-  get_known_units(sqf::get_side(sqf::player()));
+  sqf::add_action(sqf::player(), "Load plugin", code("\"intercept\" callExtension (\"load_extension:tiglath-pileser\")"));
+  sqf::add_action(sqf::player(), "Unload plugin", code("\"intercept\" callExtension (\"unload_extension:tiglath-pileser\")"));
 }

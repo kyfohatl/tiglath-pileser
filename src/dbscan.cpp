@@ -1,7 +1,7 @@
 #include "dbscan.hpp"
 
 namespace dbscan {
-  std::vector<std::shared_ptr<types::cluster>> get_clusters(std::vector<intercept::types::object> objects, float epsilon, int min_points) {
+  std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon, uint32_t min_points) {
     auto all_nodes = std::vector<types::node>();
     auto core_nodes = std::vector<std::reference_wrapper<types::node>>();
 
@@ -11,10 +11,10 @@ namespace dbscan {
 
     // Find all neighbors (within epsilon distance) of each node and label CORE points
     for (auto node : all_nodes) {
-      auto object_position = ((game_data_object*) node.object.data.get())->get_position_matrix()._position;
+      auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
 
       for (auto other_node : all_nodes) {
-        auto other_node_position = ((game_data_object*) other_node.object.data.get())->get_position_matrix()._position;
+        auto other_node_position = ((game_data_object*) other_node.object.data.getRef())->get_position_matrix()._position;
         auto distance = object_position.distance_2d_squared(other_node_position);
 
         if (distance <= epsilon) {
@@ -61,13 +61,13 @@ namespace dbscan {
     // Border points must then be allocated to a neighboring cluster
     // Currently border points are just allocated to the first neighboring cluster
     for (auto node : all_nodes) {
-      if (node.type = types::node_type::BORDER) {
+      if (node.type == types::node_type::BORDER) {
         for (types::node neighbor : node.neighbors) {
-          if (neighbor.type = types::node_type::CORE) {
+          if (neighbor.type == types::node_type::CORE) {
             node.allocated_cluster = neighbor.allocated_cluster;
             node.allocated_cluster.get()->objects.push_back(node.object);
 
-            auto object_position = ((game_data_object*) node.object.data.get())->get_position_matrix()._position;
+            auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
             node.allocated_cluster.get()->centroid += intercept::types::vector2(object_position);
 
             break;
@@ -95,7 +95,7 @@ namespace dbscan {
 
     // If no cluster has been given, create one
     auto cluster = parent_cluster;
-    auto object_position = intercept::types::vector2(((game_data_object*) node.object.data.get())->get_position_matrix()._position);
+    auto object_position = intercept::types::vector2(((game_data_object*) node.object.data.getRef())->get_position_matrix()._position);
     if (cluster == nullptr) {
       cluster = std::make_shared<types::cluster>();
       cluster.get()->centroid = object_position;
