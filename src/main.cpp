@@ -26,7 +26,13 @@ std::vector<types::object> get_known_units(types::side side) {
 void get_enemy_positions(types::side side) {
   auto units = get_known_units(side);
 
-  // auto enemy_clusters = dbscan::dbscan(units);
+  auto enemy_clusters = dbscan::dbscan(units, 25000, 4);
+
+  int i = 0; 
+  for (auto cluster : enemy_clusters) {
+    auto marker = sqf::create_marker("cluster:" + std::to_string(i++), cluster->centroid);
+    sqf::set_marker_type(marker, "hd_dot");
+  }
 
   // auto marker_colors = std::vector<std::string>({"ColorBlack", "ColorRed", "ColorBrown", "ColorBlue", "ColorGreen", "ColorWhite", "ColorOrange"});
 
@@ -51,7 +57,7 @@ void get_enemy_positions(types::side side) {
 // This function is exported and is called by the host each frame.
 void __cdecl intercept::on_frame() {
   // send it to the binary SQF sideChat command
-  intercept::sqf::side_chat(sqf::player(), "Hello HAHA");
+  intercept::sqf::side_chat(sqf::player(), "onFrame");
   get_enemy_positions(sqf::get_side(sqf::player()));
 }
 

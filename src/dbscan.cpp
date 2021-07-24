@@ -1,20 +1,29 @@
 #include "dbscan.hpp"
 
+#include <iostream>
+#include <fstream>
+
 namespace dbscan {
   std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon, uint32_t min_points) {
     auto all_nodes = std::vector<types::node>();
     auto core_nodes = std::vector<std::reference_wrapper<types::node>>();
+
+    std::ofstream log;
+    log.open ("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Arma 3\\@tiglath-pileser\\intercept\\log.txt", std::ios::trunc | std::ios::out);
+
+    log << "In dbscan" << std::endl;
 
     for (auto object : objects) {
       all_nodes.push_back({ object });
     }
 
     // Find all neighbors (within epsilon distance) of each node and label CORE points
-    for (auto node : all_nodes) {
-      auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
+    for (auto& node : all_nodes) {
+      auto object_position = intercept::sqf::get_pos(node.object);
+      log << "node round 1: " << intercept::sqf::str(node.object) << "pos: " << intercept::sqf::str(object_position) << std::endl;
 
       for (auto other_node : all_nodes) {
-        auto other_node_position = ((game_data_object*) other_node.object.data.getRef())->get_position_matrix()._position;
+        auto other_node_position = intercept::sqf::get_pos(other_node.object);
         auto distance = object_position.distance_2d_squared(other_node_position);
 
         if (distance <= epsilon) {
@@ -31,7 +40,9 @@ namespace dbscan {
       }
     }
 
-    for (auto node : all_nodes) {
+    for (auto& node : all_nodes) {
+      log << "node round 2: " << intercept::sqf::str(node.object) << ", neighors size: " << node.neighbors.size() << std::endl;
+
       if (node.type != types::node_type::CORE) {
         for (types::node other_node : node.neighbors) {
           if (other_node.type == types::node_type::CORE) {
@@ -67,7 +78,7 @@ namespace dbscan {
             node.allocated_cluster = neighbor.allocated_cluster;
             node.allocated_cluster.get()->objects.push_back(node.object);
 
-            auto object_position = ((game_data_object*) node.object.data.getRef())->get_position_matrix()._position;
+            auto object_position = intercept::sqf::get_pos(node.object);
             node.allocated_cluster.get()->centroid += intercept::types::vector2(object_position);
 
             break;
@@ -80,6 +91,8 @@ namespace dbscan {
     for (auto cluster : clusters) {
       cluster.get()->centroid /= static_cast<float>(cluster.get()->objects.size());
     }
+
+    log.close();
 
     return clusters;
   }
@@ -95,7 +108,7 @@ namespace dbscan {
 
     // If no cluster has been given, create one
     auto cluster = parent_cluster;
-    auto object_position = intercept::types::vector2(((game_data_object*) node.object.data.getRef())->get_position_matrix()._position);
+    auto object_position = intercept::types::vector2(intercept::sqf::get_pos(node.object));
     if (cluster == nullptr) {
       cluster = std::make_shared<types::cluster>();
       cluster.get()->centroid = object_position;
