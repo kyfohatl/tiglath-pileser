@@ -53,3 +53,7 @@ else()
 endif()
 
 install(TARGETS ${INTERCEPT_PLUGIN_NAME} RUNTIME DESTINATION ".")
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/../addons)
+install(CODE "set(CMAKE_SOURCE_DIR \"${CMAKE_SOURCE_DIR}\")")
+install(CODE "set(CMAKE_INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")")
+install(SCRIPT "PostInstall.cmake")
