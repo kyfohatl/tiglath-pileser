@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.8)
 
 #----Make changes here
 
@@ -8,6 +8,10 @@ project (tiglath-pileser)
 #This setting enables the use of the engine string type instead of converting to std::string.
 #Enabling this results in better performance when handling strings to SQF commands.
 option(USE_ENGINE_TYPES "USE_ENGINE_TYPES" OFF)
+
+if (WIN32)
+    set(CMAKE_INSTALL_PREFIX "$ENV{ProgramFiles\(x86\)}/Steam/steamapps/common/Arma 3/@tiglath-pileser/intercept")
+endif()
 
 #----Don't change anything below this line
 
