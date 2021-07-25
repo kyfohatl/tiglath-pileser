@@ -6,6 +6,8 @@
 
 #include <intercept.hpp>
 
+// test
+
 namespace dbscan {
   namespace types {
     enum class node_type : uint8_t {
