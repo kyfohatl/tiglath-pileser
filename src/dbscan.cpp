@@ -1,7 +1,7 @@
 #include "dbscan.hpp"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace dbscan {
   std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon, uint32_t min_points) {
@@ -9,7 +9,7 @@ namespace dbscan {
     auto core_nodes = std::vector<std::shared_ptr<types::node>>();
 
     std::ofstream log;
-    log.open ("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Arma 3\\@tiglath-pileser\\intercept\\log.txt", std::ios::trunc | std::ios::out);
+    log.open("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Arma 3\\@tiglath-pileser\\intercept\\log.txt", std::ios::trunc | std::ios::out);
 
     log << "In dbscan" << std::endl;
 
@@ -99,7 +99,6 @@ namespace dbscan {
     return clusters;
   }
 
-
   // Forms a cluster using the given core point and all connected neighboring and neighbors of neighboring core points
   // and returns the result
   std::shared_ptr<types::cluster> form_core_cluster(std::shared_ptr<types::node> node, std::shared_ptr<types::cluster> parent_cluster) {
@@ -130,4 +129,4 @@ namespace dbscan {
 
     return cluster;
   }
-};
+}; // namespace dbscan

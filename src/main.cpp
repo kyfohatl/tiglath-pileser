@@ -1,6 +1,6 @@
+#include <cmath>
 #include <intercept.hpp>
 #include <string>
-#include <cmath>
 
 #include "dbscan.hpp"
 

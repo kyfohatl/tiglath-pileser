@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include <intercept.hpp>
 
@@ -26,9 +26,9 @@ namespace dbscan {
       node_type type = node_type::UNKNOWN;
       std::shared_ptr<cluster> allocated_cluster = nullptr;
     };
-  };
+  }; // namespace types
 
   std::vector<std::shared_ptr<types::cluster>> dbscan(std::vector<intercept::types::object> objects, float epsilon = 2500.f, uint32_t min_points = 4);
 
   std::shared_ptr<types::cluster> form_core_cluster(std::shared_ptr<types::node> node, std::shared_ptr<types::cluster> parent_cluster = nullptr);
-};
+}; // namespace dbscan

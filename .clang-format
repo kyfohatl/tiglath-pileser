@@ -1,0 +1,5 @@
+IndentWidth: 2
+UseTab: Never
+ContinuationIndentWidth: 2
+NamespaceIndentation: All
+ColumnLimit: 0
